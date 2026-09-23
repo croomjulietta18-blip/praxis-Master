@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#243b53"><title>Praxis Master Study App</title><style>body{font-family:system-ui;margin:0;background:#f4f7fb;color:#17212b}header{background:#243b53;color:#fff;padding:18px;position:sticky;top:0}main{max-width:850px;margin:auto;padding:16px}.card{background:white;border:1px solid #d9e2ec;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 12px #0001}button{padding:12px 15px;border:0;border-radius:12px;margin:5px;font-weight:700;cursor:pointer}.primary{background:#2563eb;color:white}.green{background:#15803d;color:white}.light{background:#e7eef8}.choice{display:block;width:100%;text-align:left;background:#fff;border:2px solid #d9e2ec;margin:8px 0}.correct{background:#dcfce7!important;border-color:#16a34a!important}.wrong{background:#fee2e2!important;border-color:#dc2626!important}.tag{display:inline-block;background:#eef2ff;padding:4px 8px;border-radius:20px;margin-right:5px;font-size:.8em}.bar{height:12px;background:#e5e7eb;border-radius:20px;overflow:hidden}.fill{height:100%;background:#2563eb}.metric{font-size:2em;font-weight:800}textarea{width:100%;min-height:150px}@media(max-width:600px){main{padding:10px}button{width:auto}}
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#243b53"><title>Praxis Master Study App</title><style>body{font-family:system-ui;margin:0;background:#f4f7fb;color:#17212b}header{background:#243b53;color:#fff;padding:18px;position:sticky;top:0}main{max-width:850px;margin:auto;padding:16px}.card{background:white;border:1px solid #d9e2ec;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 12px #0001}button{padding:12px 15px;border:0;border-radius:12px;margin:5px;font-weight:700;cursor:pointer}.primary{background:#2563eb;color:white}.green{background:#15803d;color:white}.light{background:#e7eef8}.choice{display:block;width:100%;min-height:56px;text-align:left;background:#fff;border:2px solid #d9e2ec;margin:8px 0;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(37,99,235,.18)}.choice.sel{background:#dbeafe!important;border-color:#2563eb!important;box-shadow:0 0 0 2px #2563eb inset}.correct{background:#dcfce7!important;border-color:#16a34a!important}.wrong{background:#fee2e2!important;border-color:#dc2626!important}.tag{display:inline-block;background:#eef2ff;padding:4px 8px;border-radius:20px;margin-right:5px;font-size:.8em}.bar{height:12px;background:#e5e7eb;border-radius:20px;overflow:hidden}.fill{height:100%;background:#2563eb}.metric{font-size:2em;font-weight:800}textarea{width:100%;min-height:150px}@media(max-width:600px){main{padding:10px}button{width:auto}}
 </style>
 <meta name="theme-color" content="#173b6c">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -51,11 +51,21 @@ dash();
   // Full-length exam simulator upgrade.
   // Uses the app's existing original practice banks, creates reworded variants,
   // reshuffles every sitting, and matches official question counts/timing.
+  const COUN_BANK = [
+    ["Define","Counselor Role","A counselor is asked to spend most of the day on clerical scheduling. What is the best response?",["Accept all clerical duties permanently.","Clarify the counseling role and collaborate with administrators to align duties with student-support responsibilities.","Stop counseling.","Ignore the administrator."],1],
+    ["Define","Confidentiality","Which statement best describes confidentiality in school counseling?",["It is absolute.","It has ethical and legal limits that should be explained appropriately.","It never applies to minors.","Information can be shared freely."],1],
+    ["Deliver","Referral","A student's needs exceed the counselor's scope of practice. What should the counselor do?",["Provide specialized treatment without training.","Consult and refer to qualified professionals while continuing appropriate school support.","Ignore it.","Tell the student no help exists."],1],
+    ["Deliver","Consultation","A teacher reports repeated behavior concerns. A useful consultation step is to:",["Gather specific observations and collaboratively identify supports.","Assume intentional misconduct.","Recommend punishment immediately.","Avoid the teacher."],0],
+    ["Manage","Program Planning","A comprehensive counseling program should be guided by:",["Personal interests.","Student needs, school data, professional standards, and program goals.","Only last year's activities.","One teacher's requests."],1],
+    ["Manage","Ethics","When facing an ethical dilemma, the counselor should:",["Use personal opinion only.","Consult ethical codes, laws, policies, supervisors, and appropriate resources.","Post it online.","Ask students to decide."],1],
+    ["Assess","Outcome Data","A counselor compares attendance before and after an intervention. This is an example of:",["Outcome data.","Only demographic data.","Anecdote.","A seating chart."],0],
+    ["Assess","Equity Data","Why disaggregate counseling outcomes by student subgroup?",["To label students.","To identify patterns or disparities that may need attention.","To exclude students.","To guarantee identical outcomes."],1]
+  ];
   const oldHome = window.home;
   function getBank(which){
     try {
       if(which==="ELA" && typeof E!=="undefined") return E;
-      if(which==="COUN" && typeof C!=="undefined") return C;
+      if(which==="COUN") return COUN_BANK;
       if(which==="ELA" && typeof ELA!=="undefined") return ELA;
       if(which==="COUN" && typeof COUN!=="undefined") return COUN;
       if(which==="ELA" && typeof banks!=="undefined") return banks.ELA||[];
@@ -134,11 +144,30 @@ dash();
     let a=document.getElementById("app");
     a.innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;gap:12px"><b>${e.which==="ELA"?"ELA 5047":"School Counselor 5422"}</b><b id="pmclock"></b></div>
     <p>Question ${e.i+1} of ${e.qs.length}</p><h3>${text}</h3>
-    ${opts.map((o,k)=>`<button class="choice ${e.ans[e.i]===k?"sel":""}" onclick="PM_pick(${k})">${String.fromCharCode(65+k)}. ${o}</button>`).join("")}
-    <div><button onclick="PM_prev()">Previous</button><button onclick="PM_next()">${e.i===e.qs.length-1?"Finish":"Next"}</button></div></div>`;
+    ${opts.map((o,k)=>`<button type="button" class="choice ${e.ans[e.i]===k?"sel":""}" aria-pressed="${e.ans[e.i]===k}" data-pm-choice="${k}">${String.fromCharCode(65+k)}. ${o}</button>`).join("")}
+    ${e.ans[e.i]!==null?`<p style="font-weight:800;color:#1d4ed8">✓ Answer ${String.fromCharCode(65+e.ans[e.i])} selected</p>`:""}
+    <div><button type="button" onclick="PM_prev()">Previous</button><button type="button" onclick="PM_next()">${e.i===e.qs.length-1?"Finish":"Next"}</button></div></div>`;
     let c=document.getElementById("pmclock"); if(c){let m=Math.floor(PM_seconds/60),s=PM_seconds%60;c.textContent=m+":"+String(s).padStart(2,"0");}
   };
-  window.PM_pick=function(k){PM_exam.ans[PM_exam.i]=k;PM_render()};
+  window.PM_pick=function(k){
+    if(!window.PM_exam) return;
+    PM_exam.ans[PM_exam.i]=Number(k);
+    PM_render();
+  };
+  // iPhone/iPad-safe delegated answer handling. Avoids reliance on inline onclick.
+  function PM_choiceEvent(ev){
+    let btn=ev.target && ev.target.closest ? ev.target.closest('[data-pm-choice]') : null;
+    if(!btn) return;
+    ev.preventDefault();
+    PM_pick(btn.getAttribute('data-pm-choice'));
+  }
+  document.addEventListener('click',PM_choiceEvent,false);
+  document.addEventListener('touchend',function(ev){
+    let btn=ev.target && ev.target.closest ? ev.target.closest('[data-pm-choice]') : null;
+    if(!btn) return;
+    ev.preventDefault();
+    PM_pick(btn.getAttribute('data-pm-choice'));
+  },{passive:false});
   window.PM_prev=function(){if(PM_exam.i>0){PM_exam.i--;PM_render()}};
   window.PM_next=function(){if(PM_exam.i<PM_exam.qs.length-1){PM_exam.i++;PM_render()}else PM_finish()};
   window.PM_finish=function(){
