@@ -1,0 +1,187 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#243b53"><title>Praxis Master Study App</title><style>body{font-family:system-ui;margin:0;background:#f4f7fb;color:#17212b}header{background:#243b53;color:#fff;padding:18px;position:sticky;top:0}main{max-width:850px;margin:auto;padding:16px}.card{background:white;border:1px solid #d9e2ec;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 12px #0001}button{padding:12px 15px;border:0;border-radius:12px;margin:5px;font-weight:700;cursor:pointer}.primary{background:#2563eb;color:white}.green{background:#15803d;color:white}.light{background:#e7eef8}.choice{display:block;width:100%;text-align:left;background:#fff;border:2px solid #d9e2ec;margin:8px 0;touch-action:manipulation;-webkit-tap-highlight-color:rgba(37,99,235,.18)}.choice.sel{background:#dbeafe!important;border-color:#2563eb!important;box-shadow:0 0 0 2px #2563eb inset}.correct{background:#dcfce7!important;border-color:#16a34a!important}.wrong{background:#fee2e2!important;border-color:#dc2626!important}.tag{display:inline-block;background:#eef2ff;padding:4px 8px;border-radius:20px;margin-right:5px;font-size:.8em}.bar{height:12px;background:#e5e7eb;border-radius:20px;overflow:hidden}.fill{height:100%;background:#2563eb}.metric{font-size:2em;font-weight:800}textarea{width:100%;min-height:150px}@media(max-width:600px){main{padding:10px}button{width:auto}}
+</style>
+<meta name="theme-color" content="#173b6c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Praxis Master">
+<link rel="manifest" href="manifest.webmanifest">
+
+</head><body><header><h2>📚 Praxis Master Study App</h2><div>Middle School ELA 5047 + School Counselor 5422</div></header><main id="app"></main><script>
+const E=[
+['Reading','Main Idea','A passage describes a town restoring a riverfront by removing trash, planting native vegetation, and adding walking paths. What is the central idea?',['The town improved the riverfront through several coordinated restoration efforts.','Walking paths are the only important improvement.','Native plants are always easy to maintain.','The project will increase property values.'],0,'The first choice includes the major actions without adding an unsupported claim.'],
+['Reading','Inference','A character checks the clock, rereads interview notes, and practices answers aloud. What is the best inference?',['The character is bored.','The character is preparing carefully and feels some anxiety.','The character dislikes interviews.','The character already failed.'],1,'The actions support careful preparation and nervousness.'],
+['Reading','Figurative Language','“The hallway was a river of students flowing toward lunch.” What device is used?',['Simile','Metaphor','Irony','Allusion'],1,'The hallway is directly compared to a river without like or as.'],
+['Language','Agreement','Choose the sentence that follows standard English conventions.',['The group of students are presenting.','The group of students is presenting.','The group of students were presenting.','The group of students have presented.'],1,'The subject is singular group, so is is the appropriate verb.'],
+['Language','Comma Use','Which sentence uses commas correctly?',['After the meeting we went home.','After the meeting, we went home.','After, the meeting we went home.','After the meeting we, went home.'],1,'A comma follows an introductory phrase.'],
+['Language','Parallelism','Which sentence uses parallel structure?',['The class enjoys reading, writing, and discussing.','The class enjoys reading, to write, and discussion.','The class enjoys reading, writing, and to discuss.','The class enjoys to read, writing, and discussion.'],0,'The three activities use matching -ing forms.'],
+['Writing','Thesis','Which is the strongest thesis for an essay about school gardens?',['School gardens are interesting.','Many schools have gardens.','Schools should maintain gardens because they provide hands-on science learning and responsibility practice.','I like gardening.'],2,'A strong thesis makes a clear, supportable claim and previews reasons.'],
+['Writing','Revision','What best helps a writer determine whether an argument is supported?',['Check whether each major claim has relevant evidence and reasoning.','Make every sentence longer.','Add decorative adjectives.','Change the font.'],0,'Argument quality depends on relevant evidence and reasoning.'],
+['Instruction','Formative Assessment','A teacher uses student annotations to decide what to reteach tomorrow. This is primarily:',['Summative assessment','Formative assessment','A final grade','Norm-referenced testing'],1,'Evidence gathered during instruction to adjust teaching is formative assessment.'],
+['Instruction','Feedback','Which feedback is most actionable for a weak claim?',['Good job.','Wrong.','Add evidence from the text and explain how it supports your claim.','Rewrite everything.'],2,'Effective feedback is specific, actionable, and connected to the learning goal.']
+];
+const C=[
+['Define','Counselor Role','A counselor is asked to spend most of the day on clerical scheduling. What is the best response?',['Accept all clerical duties permanently.','Clarify the counseling role and collaborate with administrators to align duties with student-support responsibilities.','Stop counseling.','Ignore the administrator.'],1,'Professional role clarity and collaboration help protect time for appropriate student services.'],
+['Define','Confidentiality','Which statement best describes confidentiality in school counseling?',['It is absolute.','It has ethical and legal limits that should be explained appropriately.','It never applies to minors.','Information can be shared freely.'],1,'School counseling confidentiality has safety and legal limits.'],
+['Define','Development','When selecting an intervention, which factor is especially important?',['The counselor’s favorite theory','The student’s developmental level and presenting need','The school mascot','The counselor’s personal experience'],1,'Interventions should be developmentally appropriate and responsive to the student need.'],
+['Define','Theory','A counselor asks a student to imagine that the problem has disappeared and describe what would be different. This is the:',['Miracle question','Projective test','Behavioral contract','Career inventory'],0,'The miracle question is a solution-focused counseling technique.'],
+['Deliver','Group Counseling','At the start of a counseling group, the counselor should prioritize:',['No expectations','Purpose, norms, confidentiality limits, and participation expectations','Private disclosures from every member','Grades'],1,'Clear structure and expectations promote safe and effective group participation.'],
+['Deliver','Referral','A student’s needs exceed the counselor’s scope of practice. What should the counselor do?',['Provide specialized treatment without training.','Consult and refer to qualified professionals while continuing appropriate school support.','Ignore it.','Tell the student no help exists.'],1,'Referral and collaboration respect professional scope and protect students.'],
+['Deliver','Consultation','A teacher reports repeated behavior concerns. A useful consultation step is to:',['Gather specific observations and collaboratively identify supports.','Assume intentional misconduct.','Recommend punishment immediately.','Avoid the teacher.'],0,'Consultation should be collaborative and evidence-informed.'],
+['Manage','Program Planning','A comprehensive counseling program should be guided by:',['Personal interests','Student needs, school data, professional standards, and program goals','Only last year’s activities','One teacher’s requests'],1,'Effective program planning is standards-aligned and data-informed.'],
+['Manage','Ethical Decision Making','When facing an ethical dilemma, the counselor should:',['Use personal opinion only.','Consult ethical codes, laws, policies, supervisors, and appropriate resources.','Post it online.','Ask students to decide.'],1,'Systematic consultation with ethical and legal resources supports sound decisions.'],
+['Assess','Outcome Data','A counselor compares attendance before and after an intervention. This is an example of:',['Outcome data','Only demographic data','Anecdote','A seating chart'],0,'Attendance change can provide outcome information.'],
+['Assess','Data Interpretation','Attendance improved after a program, but other factors may also explain the change. What can be concluded?',['The program definitely caused it.','The improvement followed the program, but causation is not established.','The data are worthless.','Every student improved for the same reason.'],1,'Before-and-after association alone does not establish causation.'],
+['Assess','Equity Data','Why disaggregate counseling outcomes by student subgroup?',['To label students','To identify patterns or disparities that may need attention','To exclude students','To guarantee identical outcomes'],1,'Disaggregated data can reveal patterns hidden in overall averages.']
+];
+let S=JSON.parse(localStorage.getItem('praxisMaster')||'null')||{sub:'ELA',answered:0,correct:0,missed:[],history:[],mastery:{}};
+function save(){localStorage.setItem('praxisMaster',JSON.stringify(S))}function bank(){return S.sub==='ELA'?E:C}function pct(a,b){return b?Math.round(a/b*100):0}function esc(x){return String(x).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
+function dash(){let p=pct(S.correct,S.answered);app.innerHTML=`<div class=card><h1>Welcome 👋</h1><p>Choose an exam. Missed concepts are saved and recycled in adaptive review.</p><button class=primary onclick="setsub('ELA')">Middle School ELA 5047</button><button class=primary onclick="setsub('C')">School Counselor 5422</button></div><div class=card><div class=metric>${p}%</div><div>Overall accuracy • ${S.answered} questions answered • ${S.missed.length} concepts to review</div><div class=bar><div class=fill style="width:${p}%"></div></div></div><div class=card><button class=green onclick="start(10,true)">🎯 Adaptive 10</button><button class=primary onclick="start(10,false)">📝 Practice 10</button><button class=light onclick="start(25,false)">📚 Practice 25</button></div><div class=card><h3>Study Guide</h3><p><b>ELA:</b> Reading • Language/Vocabulary • Writing/Speaking/Listening • ELA Instruction</p><p><b>Counselor:</b> Define • Deliver • Manage • Assess</p><button class=light onclick="guide()">Open Study Guide</button></div><div class=card><h3>Progress</h3><button class=light onclick="progress()">View scores & export</button></div>`}
+function setsub(x){S.sub=x;save();dash()}function guide(){let topics=[...new Set(bank().map(q=>q[0]))];app.innerHTML=`<div class=card><h2>📖 ${S.sub==='ELA'?'Middle School ELA 5047':'School Counselor 5422'}</h2>${topics.map(t=>`<details><summary>${t}</summary><p>${bank().filter(q=>q[0]===t).map(q=>q[1]).join(' • ')}</p><button class=primary onclick="startTopic('${t}')">Practice ${t}</button></details>`).join('')}<button class=light onclick=dash()>Back</button></div>`}
+let Q=[],i=0,score=0;function start(n,adaptive){let b=bank(),arr=[];if(adaptive)S.missed.forEach(id=>{let x=b.find(q=>q[1]===id);if(x)arr.push(x)});arr=arr.concat(b.sort(()=>Math.random()-.5));Q=arr.slice(0,n);if(Q.length<n)Q=b.slice();i=0;score=0;render()}
+function startTopic(t){Q=bank().filter(q=>q[0]===t).sort(()=>Math.random()-.5);i=0;score=0;render()}
+function render(){if(i>=Q.length)return finish();let q=Q[i];app.innerHTML=`<div class=card><b>Question ${i+1} of ${Q.length}</b><div class=bar><div class=fill style="width:${pct(i,Q.length)}%"></div></div><p><span class=tag>${esc(q[0])}</span><span class=tag>${esc(q[1])}</span></p><h3>${esc(q[2])}</h3><div id=choices>${q[3].map((x,k)=>`<button class=choice onclick="ans(${k})">${String.fromCharCode(65+k)}. ${esc(x)}</button>`).join('')}</div><div id=fb></div></div>`}
+function ans(k){let q=Q[i],ok=k===q[4];document.querySelectorAll('.choice').forEach((b,n)=>{b.disabled=true;if(n===q[4])b.classList.add('correct');if(n===k&&!ok)b.classList.add('wrong')});if(ok)score++;S.answered++;if(ok)S.correct++;let id=q[1];if(!ok&&!S.missed.includes(id))S.missed.push(id);if(ok){let z=S.missed.indexOf(id);if(z>=0)S.missed.splice(z,1)}S.mastery[id]=(S.mastery[id]||0)+(ok?1:0);save();fb.innerHTML=`<div class=card><b>${ok?'✅ Correct':'❌ Review this concept'}</b><p><b>Answer:</b> ${String.fromCharCode(65+q[4])}. ${esc(q[3][q[4]])}</p><p>${esc(q[5])}</p>${!ok?'<p><b>🔁 Saved for adaptive review.</b></p>':''}<button class=primary onclick="i++;render()">Next</button></div>`}
+function finish(){S.history.push({date:new Date().toLocaleString(),sub:S.sub,score,total:Q.length});if(S.history.length>20)S.history.shift();save();app.innerHTML=`<div class=card><h2>🎉 Session Complete</h2><div class=metric>${score}/${Q.length} (${pct(score,Q.length)}%)</div><p>${S.missed.length} concept(s) currently need review.</p><button class=green onclick="start(10,true)">🔁 Review Missed</button><button class=primary onclick="start(10,false)">New Practice</button><button class=light onclick=progress()>Progress</button></div>`}
+function progress(){app.innerHTML=`<div class=card><h2>📊 Progress</h2><p>Accuracy: <b>${pct(S.correct,S.answered)}%</b></p><p>Answered: ${S.answered} • Correct: ${S.correct} • Review concepts: ${S.missed.length}</p><h3>Recent sessions</h3>${S.history.slice().reverse().map(x=>`<p>${x.sub} — ${x.score}/${x.total} (${pct(x.score,x.total)}%) — ${esc(x.date)}</p>`).join('')||'<p>No sessions yet.</p>'}<button class=primary onclick=exporter()>⬇️ Export Progress</button><label class=light style="display:inline-block;padding:12px;border-radius:12px">⬆️ Import Progress <input type=file accept=.json hidden onchange=importer(event)></label><button class=light onclick=dash()>Home</button></div>`}
+function exporter(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='praxis-progress.json';a.click()}function importer(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{S=JSON.parse(r.result);save();progress()};r.readAsText(f)}
+dash();
+</script></main>
+<script>
+(function(){
+  // Full-length exam simulator upgrade.
+  // Uses the app's existing original practice banks, creates reworded variants,
+  // reshuffles every sitting, and matches official question counts/timing.
+  const COUN_BANK = [
+    ["Define","Counselor Role","A counselor is asked to spend most of the day on clerical scheduling. What is the best response?",["Accept all clerical duties permanently.","Clarify the counseling role and collaborate with administrators to align duties with student-support responsibilities.","Stop counseling.","Ignore the administrator."],1],
+    ["Define","Confidentiality","Which statement best describes confidentiality in school counseling?",["It is absolute.","It has ethical and legal limits that should be explained appropriately.","It never applies to minors.","Information can be shared freely."],1],
+    ["Deliver","Referral","A student's needs exceed the counselor's scope of practice. What should the counselor do?",["Provide specialized treatment without training.","Consult and refer to qualified professionals while continuing appropriate school support.","Ignore it.","Tell the student no help exists."],1],
+    ["Deliver","Consultation","A teacher reports repeated behavior concerns. A useful consultation step is to:",["Gather specific observations and collaboratively identify supports.","Assume intentional misconduct.","Recommend punishment immediately.","Avoid the teacher."],0],
+    ["Manage","Program Planning","A comprehensive counseling program should be guided by:",["Personal interests.","Student needs, school data, professional standards, and program goals.","Only last year's activities.","One teacher's requests."],1],
+    ["Manage","Ethics","When facing an ethical dilemma, the counselor should:",["Use personal opinion only.","Consult ethical codes, laws, policies, supervisors, and appropriate resources.","Post it online.","Ask students to decide."],1],
+    ["Assess","Outcome Data","A counselor compares attendance before and after an intervention. This is an example of:",["Outcome data.","Only demographic data.","Anecdote.","A seating chart."],0],
+    ["Assess","Equity Data","Why disaggregate counseling outcomes by student subgroup?",["To label students.","To identify patterns or disparities that may need attention.","To exclude students.","To guarantee identical outcomes."],1]
+  ];
+  const oldHome = window.home;
+  function getBank(which){
+    try {
+      if(which==="ELA" && typeof E!=="undefined") return E;
+      if(which==="COUN") return COUN_BANK;
+      if(which==="ELA" && typeof ELA!=="undefined") return ELA;
+      if(which==="COUN" && typeof COUN!=="undefined") return COUN;
+      if(which==="ELA" && typeof banks!=="undefined") return banks.ELA||[];
+      if(which==="COUN" && typeof banks!=="undefined") return banks.COUN||[];
+    } catch(e){}
+    return [];
+  }
+  function sh(a){ a=[...a]; for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; }
+  function variant(q,n){
+    if(Array.isArray(q)){
+      let x=JSON.parse(JSON.stringify(q));
+      let lead=["","Read carefully: ","Consider the following: ","Choose the best answer. "][n%4];
+      x[2]=lead+x[2];
+      let correct=x[3][x[4]];
+      x[3]=sh(x[3]);
+      x[4]=x[3].indexOf(correct);
+      return {category:x[0],concept:x[1],q:x[2],opts:x[3],a:x[4],explanation:x[5]};
+    }
+    let x=JSON.parse(JSON.stringify(q));
+    let lead=["","Read carefully: ","Consider the following: ","Choose the best answer. "][n%4];
+    x.q=lead+(x.q||x.question||"");
+    if(x.question!==undefined) x.question=x.q;
+    let opts=x.opts||x.options||x.choices;
+    let ai=(x.a!==undefined?x.a:(x.answer!==undefined?x.answer:x.correct));
+    if(Array.isArray(opts) && Number.isInteger(ai)){
+      let correct=opts[ai], mixed=sh(opts);
+      if(x.opts)x.opts=mixed; else if(x.options)x.options=mixed; else x.choices=mixed;
+      let ni=mixed.indexOf(correct);
+      if(x.a!==undefined)x.a=ni; else if(x.answer!==undefined)x.answer=ni; else x.correct=ni;
+    }
+    return x;
+  }
+  function makeFull(bank,n){
+    if(!bank.length) return [];
+    let out=[], round=0;
+    while(out.length<n){
+      let batch=sh(bank).map(q=>variant(q,round++));
+      out.push(...batch);
+    }
+    return out.slice(0,n);
+  }
+  window.PM_makeFull=makeFull;
+  window.PM_timer=null;
+  window.PM_seconds=0;
+  window.PM_startClock=function(sec,onEnd){
+    clearInterval(PM_timer); PM_seconds=sec;
+    PM_timer=setInterval(function(){
+      PM_seconds--;
+      let el=document.getElementById("pmclock");
+      if(el){let m=Math.floor(PM_seconds/60),s=PM_seconds%60;el.textContent=m+":"+String(s).padStart(2,"0");}
+      if(PM_seconds<=0){clearInterval(PM_timer);onEnd();}
+    },1000);
+  };
+  function showLaunch(){
+    const a=document.getElementById("app");
+    if(!a)return;
+    a.innerHTML=`
+      <div class="card"><h2>Full-Length Praxis Simulation</h2>
+      <p><b>Middle School ELA 5047</b><br>110 selected-response questions — 130 minutes<br>then 2 constructed responses — 30 minutes</p>
+      <button onclick="PM_launch('ELA')">Start Full 5047 Exam</button>
+      <p><b>School Counselor 5422</b><br>120 selected-response questions — 120 minutes</p>
+      <button onclick="PM_launch('COUN')">Start Full 5422 Exam</button>
+      <p class="small">Each new sitting reshuffles the entire exam and rewords/reorders practice items. This is an original practice simulator, not an official ETS test.</p></div>`;
+  }
+  window.PM_launch=function(which){
+    let bank=getBank(which);
+    if(!bank.length){alert("The "+which+" question bank could not load. Please replace the app with the newest index.html.");return;}
+    let qs=makeFull(bank,which==="ELA"?110:120);
+    window.PM_exam={which,qs,i:0,ans:Array(qs.length).fill(null)};
+    PM_render();
+    PM_startClock((which==="ELA"?130:120)*60,PM_finish);
+  };
+  window.PM_render=function(){
+    let e=PM_exam,q=e.qs[e.i], opts=q.opts||q.options||q.choices||[];
+    let text=q.q||q.question||"";
+    let a=document.getElementById("app");
+    a.innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;gap:12px"><b>${e.which==="ELA"?"ELA 5047":"School Counselor 5422"}</b><b id="pmclock"></b></div>
+    <p>Question ${e.i+1} of ${e.qs.length}</p><h3>${text}</h3>
+    ${opts.map((o,k)=>`<button type="button" class="choice ${e.ans[e.i]===k?"sel":""}" aria-pressed="${e.ans[e.i]===k}" onclick="PM_pick(${k})">${String.fromCharCode(65+k)}. ${o}</button>`).join("")}
+    ${e.ans[e.i]!==null?`<p style="font-weight:800;color:#1d4ed8">✓ Answer ${String.fromCharCode(65+e.ans[e.i])} selected</p>`:""}
+    <div><button type="button" onclick="PM_prev()">Previous</button><button type="button" onclick="PM_next()">${e.i===e.qs.length-1?"Finish":"Next"}</button></div></div>`;
+    let c=document.getElementById("pmclock"); if(c){let m=Math.floor(PM_seconds/60),s=PM_seconds%60;c.textContent=m+":"+String(s).padStart(2,"0");}
+  };
+  window.PM_pick=function(k){PM_exam.ans[PM_exam.i]=k;PM_render()};
+  window.PM_prev=function(){if(PM_exam.i>0){PM_exam.i--;PM_render()}};
+  window.PM_next=function(){if(PM_exam.i<PM_exam.qs.length-1){PM_exam.i++;PM_render()}else PM_finish()};
+  window.PM_finish=function(){
+    clearInterval(PM_timer);
+    let e=PM_exam,correct=0;
+    e.qs.forEach((q,i)=>{let ai=q.a!==undefined?q.a:(q.answer!==undefined?q.answer:q.correct);if(e.ans[i]===ai)correct++});
+    let pct=Math.round(correct/e.qs.length*100),a=document.getElementById("app");
+    if(e.which==="ELA"){
+      a.innerHTML=`<div class="card"><h2>Selected Response Complete</h2><h1>${correct}/110</h1><p>${pct}% practice accuracy</p><p>The official 5047 has a separately timed 30-minute section for 2 constructed responses.</p><button onclick="PM_cr()">Start 30-minute writing section</button></div>`;
+    } else {
+      a.innerHTML=`<div class="card"><h2>School Counselor 5422 Complete</h2><h1>${correct}/120</h1><p>${pct}% practice accuracy</p><button onclick="PM_home()">Take a newly mixed test</button></div>`;
+    }
+  };
+  window.PM_cr=function(){
+    window.PM_crn=0; window.PM_crtext=["",""]; PM_crRender();
+    PM_startClock(30*60,function(){PM_crDone()});
+  };
+  window.PM_crRender=function(){
+    let prompts=[
+      "Constructed Response 1: Analyze how two specific details or literary devices in a text contribute to a central idea. Support the analysis with textual evidence. Practice by selecting a short literary passage you have recently read.",
+      "Constructed Response 2: A middle-school student's argument has a clear claim and relevant facts, but little explanation connecting the evidence to the claim. Identify a strength, identify instructional needs, and describe a specific activity to improve the student's evidence-based reasoning."
+    ];
+    let a=document.getElementById("app");
+    a.innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between"><b>5047 Constructed Response ${PM_crn+1}/2</b><b id="pmclock"></b></div><h3>${prompts[PM_crn]}</h3>
+    <textarea style="width:100%;min-height:300px;font-size:17px" oninput="PM_crtext[PM_crn]=this.value">${PM_crtext[PM_crn]}</textarea>
+    <button onclick="PM_crMove(-1)">Previous</button><button onclick="${PM_crn===1?"PM_crDone()":"PM_crMove(1)"}">${PM_crn===1?"Finish":"Next"}</button></div>`;
+  };
+  window.PM_crMove=function(d){PM_crn=Math.max(0,Math.min(1,PM_crn+d));PM_crRender()};
+  window.PM_crDone=function(){clearInterval(PM_timer);document.getElementById("app").innerHTML=`<div class="card"><h2>Full 5047 practice complete</h2><p>You completed 110 selected-response questions plus 2 constructed responses under the official section timing.</p><button onclick="PM_home()">Home</button></div>`};
+  window.PM_home=showLaunch;
+  setTimeout(showLaunch,0);
+})();
+</script>
+
+</body></html>
