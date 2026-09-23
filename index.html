@@ -45,4 +45,121 @@ function finish(){S.history.push({date:new Date().toLocaleString(),sub:S.sub,sco
 function progress(){app.innerHTML=`<div class=card><h2>📊 Progress</h2><p>Accuracy: <b>${pct(S.correct,S.answered)}%</b></p><p>Answered: ${S.answered} • Correct: ${S.correct} • Review concepts: ${S.missed.length}</p><h3>Recent sessions</h3>${S.history.slice().reverse().map(x=>`<p>${x.sub} — ${x.score}/${x.total} (${pct(x.score,x.total)}%) — ${esc(x.date)}</p>`).join('')||'<p>No sessions yet.</p>'}<button class=primary onclick=exporter()>⬇️ Export Progress</button><label class=light style="display:inline-block;padding:12px;border-radius:12px">⬆️ Import Progress <input type=file accept=.json hidden onchange=importer(event)></label><button class=light onclick=dash()>Home</button></div>`}
 function exporter(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='praxis-progress.json';a.click()}function importer(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{S=JSON.parse(r.result);save();progress()};r.readAsText(f)}
 dash();
-</script></main></body></html>
+</script></main>
+<script>
+(function(){
+  // Full-length exam simulator upgrade.
+  // Uses the app's existing original practice banks, creates reworded variants,
+  // reshuffles every sitting, and matches official question counts/timing.
+  const oldHome = window.home;
+  function getBank(which){
+    try {
+      if(which==="ELA" && typeof ELA!=="undefined") return ELA;
+      if(which==="COUN" && typeof COUN!=="undefined") return COUN;
+      if(which==="ELA" && typeof banks!=="undefined") return banks.ELA||[];
+      if(which==="COUN" && typeof banks!=="undefined") return banks.COUN||[];
+    } catch(e){}
+    return [];
+  }
+  function sh(a){ a=[...a]; for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; }
+  function variant(q,n){
+    let x=JSON.parse(JSON.stringify(q));
+    let lead=["","Read carefully: ","Consider the following: ","Choose the best answer. "][n%4];
+    x.q=lead+(x.q||x.question||"");
+    if(x.question!==undefined) x.question=x.q;
+    let opts=x.opts||x.options||x.choices;
+    let ai=(x.a!==undefined?x.a:(x.answer!==undefined?x.answer:x.correct));
+    if(Array.isArray(opts) && Number.isInteger(ai)){
+      let correct=opts[ai], mixed=sh(opts);
+      if(x.opts)x.opts=mixed; else if(x.options)x.options=mixed; else x.choices=mixed;
+      let ni=mixed.indexOf(correct);
+      if(x.a!==undefined)x.a=ni; else if(x.answer!==undefined)x.answer=ni; else x.correct=ni;
+    }
+    return x;
+  }
+  function makeFull(bank,n){
+    if(!bank.length) return [];
+    let out=[], round=0;
+    while(out.length<n){
+      let batch=sh(bank).map(q=>variant(q,round++));
+      out.push(...batch);
+    }
+    return out.slice(0,n);
+  }
+  window.PM_makeFull=makeFull;
+  window.PM_timer=null;
+  window.PM_seconds=0;
+  window.PM_startClock=function(sec,onEnd){
+    clearInterval(PM_timer); PM_seconds=sec;
+    PM_timer=setInterval(function(){
+      PM_seconds--;
+      let el=document.getElementById("pmclock");
+      if(el){let m=Math.floor(PM_seconds/60),s=PM_seconds%60;el.textContent=m+":"+String(s).padStart(2,"0");}
+      if(PM_seconds<=0){clearInterval(PM_timer);onEnd();}
+    },1000);
+  };
+  function showLaunch(){
+    const a=document.getElementById("app");
+    if(!a)return;
+    a.innerHTML=`
+      <div class="card"><h2>Full-Length Praxis Simulation</h2>
+      <p><b>Middle School ELA 5047</b><br>110 selected-response questions — 130 minutes<br>then 2 constructed responses — 30 minutes</p>
+      <button onclick="PM_launch('ELA')">Start Full 5047 Exam</button>
+      <p><b>School Counselor 5422</b><br>120 selected-response questions — 120 minutes</p>
+      <button onclick="PM_launch('COUN')">Start Full 5422 Exam</button>
+      <p class="small">Each new sitting reshuffles the entire exam and rewords/reorders practice items. This is an original practice simulator, not an official ETS test.</p></div>`;
+  }
+  window.PM_launch=function(which){
+    let bank=getBank(which);
+    if(!bank.length){alert("The "+which+" question bank could not load. Please replace the app with the newest index.html.");return;}
+    let qs=makeFull(bank,which==="ELA"?110:120);
+    window.PM_exam={which,qs,i:0,ans:Array(qs.length).fill(null)};
+    PM_render();
+    PM_startClock((which==="ELA"?130:120)*60,PM_finish);
+  };
+  window.PM_render=function(){
+    let e=PM_exam,q=e.qs[e.i], opts=q.opts||q.options||q.choices||[];
+    let text=q.q||q.question||"";
+    let a=document.getElementById("app");
+    a.innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;gap:12px"><b>${e.which==="ELA"?"ELA 5047":"School Counselor 5422"}</b><b id="pmclock"></b></div>
+    <p>Question ${e.i+1} of ${e.qs.length}</p><h3>${text}</h3>
+    ${opts.map((o,k)=>`<button class="choice ${e.ans[e.i]===k?"sel":""}" onclick="PM_pick(${k})">${String.fromCharCode(65+k)}. ${o}</button>`).join("")}
+    <div><button onclick="PM_prev()">Previous</button><button onclick="PM_next()">${e.i===e.qs.length-1?"Finish":"Next"}</button></div></div>`;
+    let c=document.getElementById("pmclock"); if(c){let m=Math.floor(PM_seconds/60),s=PM_seconds%60;c.textContent=m+":"+String(s).padStart(2,"0");}
+  };
+  window.PM_pick=function(k){PM_exam.ans[PM_exam.i]=k;PM_render()};
+  window.PM_prev=function(){if(PM_exam.i>0){PM_exam.i--;PM_render()}};
+  window.PM_next=function(){if(PM_exam.i<PM_exam.qs.length-1){PM_exam.i++;PM_render()}else PM_finish()};
+  window.PM_finish=function(){
+    clearInterval(PM_timer);
+    let e=PM_exam,correct=0;
+    e.qs.forEach((q,i)=>{let ai=q.a!==undefined?q.a:(q.answer!==undefined?q.answer:q.correct);if(e.ans[i]===ai)correct++});
+    let pct=Math.round(correct/e.qs.length*100),a=document.getElementById("app");
+    if(e.which==="ELA"){
+      a.innerHTML=`<div class="card"><h2>Selected Response Complete</h2><h1>${correct}/110</h1><p>${pct}% practice accuracy</p><p>The official 5047 has a separately timed 30-minute section for 2 constructed responses.</p><button onclick="PM_cr()">Start 30-minute writing section</button></div>`;
+    } else {
+      a.innerHTML=`<div class="card"><h2>School Counselor 5422 Complete</h2><h1>${correct}/120</h1><p>${pct}% practice accuracy</p><button onclick="PM_home()">Take a newly mixed test</button></div>`;
+    }
+  };
+  window.PM_cr=function(){
+    window.PM_crn=0; window.PM_crtext=["",""]; PM_crRender();
+    PM_startClock(30*60,function(){PM_crDone()});
+  };
+  window.PM_crRender=function(){
+    let prompts=[
+      "Constructed Response 1: Analyze how two specific details or literary devices in a text contribute to a central idea. Support the analysis with textual evidence. Practice by selecting a short literary passage you have recently read.",
+      "Constructed Response 2: A middle-school student's argument has a clear claim and relevant facts, but little explanation connecting the evidence to the claim. Identify a strength, identify instructional needs, and describe a specific activity to improve the student's evidence-based reasoning."
+    ];
+    let a=document.getElementById("app");
+    a.innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between"><b>5047 Constructed Response ${PM_crn+1}/2</b><b id="pmclock"></b></div><h3>${prompts[PM_crn]}</h3>
+    <textarea style="width:100%;min-height:300px;font-size:17px" oninput="PM_crtext[PM_crn]=this.value">${PM_crtext[PM_crn]}</textarea>
+    <button onclick="PM_crMove(-1)">Previous</button><button onclick="${PM_crn===1?"PM_crDone()":"PM_crMove(1)"}">${PM_crn===1?"Finish":"Next"}</button></div>`;
+  };
+  window.PM_crMove=function(d){PM_crn=Math.max(0,Math.min(1,PM_crn+d));PM_crRender()};
+  window.PM_crDone=function(){clearInterval(PM_timer);document.getElementById("app").innerHTML=`<div class="card"><h2>Full 5047 practice complete</h2><p>You completed 110 selected-response questions plus 2 constructed responses under the official section timing.</p><button onclick="PM_home()">Home</button></div>`};
+  window.PM_home=showLaunch;
+  setTimeout(showLaunch,0);
+})();
+</script>
+
+</body></html>
