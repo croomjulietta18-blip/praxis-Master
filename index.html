@@ -54,6 +54,8 @@ dash();
   const oldHome = window.home;
   function getBank(which){
     try {
+      if(which==="ELA" && typeof E!=="undefined") return E;
+      if(which==="COUN" && typeof C!=="undefined") return C;
       if(which==="ELA" && typeof ELA!=="undefined") return ELA;
       if(which==="COUN" && typeof COUN!=="undefined") return COUN;
       if(which==="ELA" && typeof banks!=="undefined") return banks.ELA||[];
@@ -63,6 +65,15 @@ dash();
   }
   function sh(a){ a=[...a]; for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; }
   function variant(q,n){
+    if(Array.isArray(q)){
+      let x=JSON.parse(JSON.stringify(q));
+      let lead=["","Read carefully: ","Consider the following: ","Choose the best answer. "][n%4];
+      x[2]=lead+x[2];
+      let correct=x[3][x[4]];
+      x[3]=sh(x[3]);
+      x[4]=x[3].indexOf(correct);
+      return {category:x[0],concept:x[1],q:x[2],opts:x[3],a:x[4],explanation:x[5]};
+    }
     let x=JSON.parse(JSON.stringify(q));
     let lead=["","Read carefully: ","Consider the following: ","Choose the best answer. "][n%4];
     x.q=lead+(x.q||x.question||"");
